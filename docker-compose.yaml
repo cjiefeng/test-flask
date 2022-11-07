@@ -1,0 +1,41 @@
+version: '3.3'
+services:
+    flask_app:
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        container_name: flask_app
+        depends_on:
+            - db
+        working_dir: /flask_app
+        volumes:
+            - .:/flask_app
+        restart: always
+        environment:
+            ENV_CONFIG_PATH: /flask_app/config.py
+        ports:
+            - 5050:8080
+        networks:
+            - flask_app
+    db:
+        image: mysql:8.0
+        container_name: flask_db
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
+            MYSQL_DATABASE: test_db
+            MYSQL_USER: qwerty
+            MYSQL_PASSWORD: p@ssword
+        volumes:
+            - flask_app:/var/lib/mysql
+        ports:
+            - 3306:3306 # mysql db
+        networks:
+            - flask_app
+
+volumes:
+    flask_app:
+
+networks:
+    flask_app:
